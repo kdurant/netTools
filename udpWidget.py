@@ -10,7 +10,7 @@ class UdpWidget(QWidget):
     '''
     UDP作为Server，只需要绑定本机IP地址和端口号，Client发送数据时，指定正确的地址和端口号即可
     '''
-    udpRecvDataReady = pyqtSignal(bytes)
+    udpRecvDataReady = pyqtSignal(bytes, str, int)
     def __init__(self):
         super(UdpWidget, self).__init__()
         self.initUI()
@@ -97,7 +97,7 @@ class UdpWidget(QWidget):
             datagram, host, port = self.udpSocket.readDatagram(self.udpSocket.pendingDatagramSize())
             if datagram:
                 print(datagram)
-                self.udpRecvDataReady.emit(datagram)
+                self.udpRecvDataReady.emit(datagram, host.toString(), port)
 
     @pyqtSlot()
     def udpLinkStatus(self):
