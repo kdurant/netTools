@@ -5,6 +5,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtNetwork import QUdpSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
 
+from tcpClient import *
+
 from udpWidget import *
 
 class NetTools(QMainWindow):
@@ -15,13 +17,14 @@ class NetTools(QMainWindow):
     def initUI(self):
 
         self.udpModule = UdpWidget()
+        self.tcpClientModule =TcpClient()
 
         test = self.testUI()
 
         toolbox = QToolBox()
         toolbox.addItem(self.udpModule, "UDP")
         toolbox.addItem(QLabel('123'), "TCP Server")
-        toolbox.addItem(QLabel('456'), "TCP Client")
+        toolbox.addItem(self.tcpClientModule, "TCP Client")
 
 
         vbox = QVBoxLayout()
@@ -49,7 +52,8 @@ class NetTools(QMainWindow):
         return frame
 
     def sendData(self):
-        self.udpModule.sendUdpFrame('1234', 'utf8')
+        # self.udpModule.sendUdpFrame('1234', 'utf8')
+        self.tcpClientModule.sendTcpFrame('1234567812345678')
 
 if __name__ == "__main__":
     import sys
