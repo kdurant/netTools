@@ -30,11 +30,13 @@ class UdpWidget(QWidget):
         # self.masterIP = QLineEdit('192.168.1.166')
         self.masterIP = QLineEdit('127.0.0.1')
         self.masterIP.setInputMask('000.000.000.000')
+        self.masterIP.setToolTip('接收数据时，其他设备需要匹配本机IP地址和端口号')
         self.masterPort = QLineEdit('6666')
 
         # self.targetIP = QLineEdit('192.168.1.102')
         self.targetIP = QLineEdit('127.0.0.1')
         self.targetIP.setInputMask('000.000.000.000')
+        self.targetIP.setToolTip('发送数据时，本机需要匹配其他设备IP地址和端口号')
         self.targetPort = QLineEdit('4444')
 
         self.bindLabel = QLabel()
@@ -75,7 +77,7 @@ class UdpWidget(QWidget):
             QMessageBox.warning(self, "警告", 'UDP端口被占用')
 
     @pyqtSlot(str)
-    def sendUdpFrame(self, frame, dataMode='hex'):
+    def sendUdpFrame(self, frame, dataMode='hex', boardCast=False):
         if dataMode == 'utf8':
             data = a2b_hex(frame)
         elif dataMode == 'hex':
@@ -85,8 +87,12 @@ class UdpWidget(QWidget):
         else:
             data = a2b_hex(frame)
 
-        self.udpSocket.writeDatagram(QByteArray(data), QHostAddress(self.targetIP.text()),
+        if boardCast:
+            self.udpSocket.writeDatagram(QByteArray(data), QHostAddress.Broadcast,
                                      int(self.targetPort.text()))
+        else:
+            self.udpSocket.writeDatagram(QByteArray(data), QHostAddress(self.targetIP.text()),
+                                         int(self.targetPort.text()))
 
     @pyqtSlot()
     def processUDPDatagrams(self):
