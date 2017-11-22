@@ -13,12 +13,19 @@ class NetTools(QMainWindow):
         self.initUI()
 
     def initUI(self):
+
         self.udpModule = UdpWidget()
 
         test = self.testUI()
 
+        toolbox = QToolBox()
+        toolbox.addItem(self.udpModule, "UDP")
+        toolbox.addItem(QLabel('123'), "TCP Server")
+        toolbox.addItem(QLabel('456'), "TCP Client")
+
+
         vbox = QVBoxLayout()
-        vbox.addWidget(self.udpModule)
+        vbox.addWidget(toolbox)
         vbox.addWidget(test)
 
         mainLayout = QVBoxLayout()

@@ -25,8 +25,6 @@ class UdpWidget(QWidget):
 
     def paraUI(self):
         groupBox = QGroupBox('参数设置')
-        self.netSelectComb = QComboBox()
-        self.netSelectComb.addItems(['UDP', 'TCP Client', 'TCP Server'])
         # self.masterIP = QLineEdit('192.168.1.166')
         self.masterIP = QLineEdit('127.0.0.1')
         self.masterIP.setInputMask('000.000.000.000')
@@ -47,7 +45,6 @@ class UdpWidget(QWidget):
         # label.setPixmap(QPixmap('images/debug.svg').scaled(QSize(150, 150)))
 
         form = QFormLayout()
-        form.addRow('网络类型：', self.netSelectComb)
         form.addRow('本机IP地址：', self.masterIP)
         form.addRow('本机端口号：', self.masterPort)
         form.addRow('设备IP地址：', self.targetIP)
