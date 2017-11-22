@@ -15,8 +15,11 @@ class NetTools(QMainWindow):
     def initUI(self):
         self.udpModule = UdpWidget()
 
+        test = self.testUI()
+
         vbox = QVBoxLayout()
         vbox.addWidget(self.udpModule)
+        vbox.addWidget(test)
 
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(vbox)
@@ -25,6 +28,21 @@ class NetTools(QMainWindow):
         mainWidget.setLayout(mainLayout)
         self.setCentralWidget(mainWidget)
         pass
+
+    def testUI(self):
+
+        self.btn = QPushButton('send')
+        self.btn.clicked.connect(self.sendData)
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.btn)
+
+        frame = QFrame()
+        frame.setLayout(vbox)
+
+        return frame
+
+    def sendData(self):
+        self.udpModule.sendUdpFrame('1234', 'utf8')
 
 if __name__ == "__main__":
     import sys

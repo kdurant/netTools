@@ -1,12 +1,15 @@
 #-*- coding:utf-8 -*-
-#-*- coding:utf-8 -*-
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtNetwork import QUdpSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
 
+
 class UdpWidget(QWidget):
+    '''
+    UDP作为Server，只需要绑定本机IP地址和端口号，Client发送数据时，指定正确的地址和端口号即可
+    '''
     udpRecvDataReady = pyqtSignal(bytes)
     def __init__(self):
         super(UdpWidget, self).__init__()
@@ -63,8 +66,6 @@ class UdpWidget(QWidget):
 
     def signalSlot(self):
         self.bindBtn.clicked.connect(self.udpLinkStatus)
-        self.udpSocket.disconnected.connect(self.test)
-        self.udpSocket.connected.connect(self.test1)
 
     def udpConfig(self):
         status = self.udpSocket.bind(int(self.masterPort.text()))
@@ -73,19 +74,27 @@ class UdpWidget(QWidget):
         else:
             QMessageBox.warning(self, "警告", 'UDP端口被占用')
 
-    # @pyqtSlot(str)
-    # def sendUdpFrame(self, frame):
-    #     self.udpSocket.writeDatagram(QByteArray(a2b_hex(frame)), QHostAddress(self.targetIP.text()),
-    #                                  int(self.targetPort.text()))
+    @pyqtSlot(str)
+    def sendUdpFrame(self, frame, dataMode='hex'):
+        if dataMode == 'utf8':
+            data = a2b_hex(frame)
+        elif dataMode == 'hex':
+            data = a2b_hex(frame)
+        elif dataMode == 'ascii':
+            data = a2b_hex(frame)
+        else:
+            data = a2b_hex(frame)
+
+        self.udpSocket.writeDatagram(QByteArray(data), QHostAddress(self.targetIP.text()),
+                                     int(self.targetPort.text()))
 
     @pyqtSlot()
     def processUDPDatagrams(self):
         while self.udpSocket.hasPendingDatagrams():
             datagram, host, port = self.udpSocket.readDatagram(self.udpSocket.pendingDatagramSize())
-            # datagram = b2a_hex(datagram)
-            # datagram = datagram.decode(encoding = 'utf-8')
-            print(datagram)
-            self.udpRecvDataReady.emit(datagram)
+            if datagram:
+                print(datagram)
+                self.udpRecvDataReady.emit(datagram)
 
     @pyqtSlot()
     def udpLinkStatus(self):
@@ -101,12 +110,6 @@ class UdpWidget(QWidget):
             self.bindBtn.setText('已经断开')
             self.bindLabel.setPixmap(QPixmap('images/inactive.svg').scaled(QSize(24, 24)))
             self.udpSocket.disconnectFromHost()
-
-    def test(self):
-        print('disconnect')
-
-    def test1(self):
-        print('connect')
 
 if __name__ == "__main__":
     import sys
