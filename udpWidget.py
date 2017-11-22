@@ -6,10 +6,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtNetwork import QUdpSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
 
-class udpWidget(QWidget):
+class UdpWidget(QWidget):
     udpRecvDataReady = pyqtSignal(bytes)
     def __init__(self):
-        super(udpWidget, self).__init__()
+        super(UdpWidget, self).__init__()
         self.initUI()
 
         self.udpSocket = QUdpSocket(self)
@@ -111,6 +111,6 @@ class udpWidget(QWidget):
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
-    ui = udpWidget()
+    ui = UdpWidget()
     ui.show()
     sys.exit(app.exec_())
