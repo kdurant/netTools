@@ -2,7 +2,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtNetwork import QUdpSocket, QHostAddress
+from PyQt5.QtNetwork import QUdpSocket, QAbstractSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
 
 
@@ -15,6 +15,9 @@ class UdpWidget(QWidget):
         super(UdpWidget, self).__init__()
         self.initUI()
 
+        '''
+        disconnectFromHost, close, abort好像都可以中断udp bind状态
+        '''
         self.udpSocket = QUdpSocket(self)
         self.signalSlot()
 
@@ -113,6 +116,26 @@ class UdpWidget(QWidget):
             self.bindBtn.setText('已经断开')
             self.bindLabel.setPixmap(QPixmap('images/inactive.svg').scaled(QSize(24, 24)))
             self.udpSocket.disconnectFromHost()
+
+    def currentStatus(self):
+        '''
+        udp只有BoundState和UnconnectedState
+        :return:
+        '''
+        if self.udpSocket.state() == QAbstractSocket.UnconnectedState:
+            return 'socket没有连接'
+        elif self.udpSocket.state() == QAbstractSocket.HostLookupState:
+            return 'socket正在查找主机名称'
+        elif self.udpSocket.state() == QAbstractSocket.ConnectingState:
+            return 'socket正在查找主机名称'
+        elif self.udpSocket.state() == QAbstractSocket.ConnectedState:
+            return '连接已建立'
+        elif self.udpSocket.state() == QAbstractSocket.BoundState:
+            return 'socket绑定到一个地址和端口'
+        elif self.udpSocket.state() == QAbstractSocket.ClosingState:
+            return 'socket即将关闭'
+        elif self.udpSocket.state() == QAbstractSocket.ConnectedState:
+            return '仅限内部使用'
 
 if __name__ == "__main__":
     import sys

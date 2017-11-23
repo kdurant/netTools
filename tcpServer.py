@@ -2,7 +2,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtNetwork import QTcpServer, QHostAddress
+from PyQt5.QtNetwork import QTcpServer, QAbstractSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
 
 class TcpServer(QWidget):
@@ -36,6 +36,8 @@ class TcpServer(QWidget):
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(form)
         mainLayout.addWidget(self.linkRbtn)
+        mainLayout.addStretch(1)
+        mainLayout.setAlignment(self.linkRbtn, Qt.AlignHCenter)
 
         groupBox.setLayout(mainLayout)
         return groupBox
@@ -48,11 +50,25 @@ class TcpServer(QWidget):
     @pyqtSlot()
     def ctrlTcpStatus(self):
         if self.linkRbtn.isChecked():
-            # self.tcpClient.connectToHost(self.serverIP.text(), int(self.serverPort.text()))
-            # self.tcpServer.listen(QHostAddress.Any, int(self.clientPort.text()))
             self.tcpServer.listen(QHostAddress.Any, 1060)
         else:
             self.tcpServer.disconnectFromHost()
+
+    def currentStatus(self):
+        if self.tcpServer.state() == QAbstractSocket.UnconnectedState:
+            return 'socket没有连接'
+        elif self.tcpServer.state() == QAbstractSocket.HostLookupState:
+            return 'socket正在查找主机名称'
+        elif self.tcpServer.state() == QAbstractSocket.ConnectingState:
+            return 'socket正在查找主机名称'
+        elif self.tcpServer.state() == QAbstractSocket.ConnectedState:
+            return '连接已建立'
+        elif self.tcpServer.state() == QAbstractSocket.BoundState:
+            return 'socket绑定到一个地址和端口'
+        elif self.tcpServer.state() == QAbstractSocket.ClosingState:
+            return 'socket即将关闭'
+        elif self.tcpServer.state() == QAbstractSocket.ConnectedState:
+            return '仅限内部使用'
 
     def addConnection(self):
         try:

@@ -42,7 +42,7 @@ class TcpClient(QWidget):
 
     def signalSlot(self):
         self.linkRbtn.clicked.connect(self.ctrlTcpStatus)
-        self.linkRbtn.clicked.connect(self.currentTcpStatus)
+        self.linkRbtn.clicked.connect(self.currentStatus)
         self.tcpClient.connected.connect(self.hasConnected)
         self.tcpClient.disconnected.connect(self.hasClosed)
         self.tcpClient.readyRead.connect(self.processTcpClientDatagrams)
@@ -54,21 +54,25 @@ class TcpClient(QWidget):
         else:
             self.tcpClient.disconnectFromHost()
 
-    def currentTcpStatus(self):
+    def currentStatus(self):
+        '''
+        tcp client只有UnconnectedState和ConnectedState
+        :return:
+        '''
         if self.tcpClient.state() == QAbstractSocket.UnconnectedState:
-            QMessageBox.information(self, '信息', 'socket没有连接')
+            return 'socket没有连接'
         elif self.tcpClient.state() == QAbstractSocket.HostLookupState:
-            QMessageBox.information(self, '信息', 'socket正在查找主机名称')
+            return 'socket正在查找主机名称'
         elif self.tcpClient.state() == QAbstractSocket.ConnectingState:
-            QMessageBox.information(self, '信息', 'socket正在查找主机名称')
+            return 'socket正在查找主机名称'
         elif self.tcpClient.state() == QAbstractSocket.ConnectedState:
-            QMessageBox.information(self, '信息', '连接已建立')
+            return '连接已建立'
         elif self.tcpClient.state() == QAbstractSocket.BoundState:
-            QMessageBox.information(self, '信息', 'socket绑定到一个地址和端口')
+            return 'socket绑定到一个地址和端口'
         elif self.tcpClient.state() == QAbstractSocket.ClosingState:
-            QMessageBox.information(self, '信息', 'socket即将关闭')
+            return 'socket即将关闭'
         elif self.tcpClient.state() == QAbstractSocket.ConnectedState:
-            QMessageBox.information(self, '信息', '仅限内部使用')
+            return '仅限内部使用'
 
     @pyqtSlot()
     def processTcpClientDatagrams(self):
