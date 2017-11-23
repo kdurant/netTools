@@ -36,6 +36,8 @@ class TcpClient(QWidget):
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(form)
         mainLayout.addWidget(self.linkRbtn)
+        mainLayout.addStretch(1)
+        mainLayout.setAlignment(self.linkRbtn, Qt.AlignHCenter)
 
         groupBox.setLayout(mainLayout)
         return groupBox
