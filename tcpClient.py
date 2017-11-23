@@ -2,7 +2,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtNetwork import QTcpSocket, QHostAddress
+from PyQt5.QtNetwork import QTcpSocket, QAbstractSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
 
 class TcpClient(QWidget):
@@ -42,8 +42,9 @@ class TcpClient(QWidget):
 
     def signalSlot(self):
         self.linkRbtn.clicked.connect(self.ctrlTcpStatus)
-        self.tcpClient.connected.connect(self.sendRequest)
-        self.tcpClient.disconnected.connect(self.serverHasStopped)
+        self.linkRbtn.clicked.connect(self.currentTcpStatus)
+        self.tcpClient.connected.connect(self.hasConnected)
+        self.tcpClient.disconnected.connect(self.hasClosed)
         self.tcpClient.readyRead.connect(self.processTcpClientDatagrams)
 
     @pyqtSlot()
@@ -53,9 +54,26 @@ class TcpClient(QWidget):
         else:
             self.tcpClient.disconnectFromHost()
 
+    def currentTcpStatus(self):
+        if self.tcpClient.state() == QAbstractSocket.UnconnectedState:
+            QMessageBox.information(self, '信息', 'socket没有连接')
+        elif self.tcpClient.state() == QAbstractSocket.HostLookupState:
+            QMessageBox.information(self, '信息', 'socket正在查找主机名称')
+        elif self.tcpClient.state() == QAbstractSocket.ConnectingState:
+            QMessageBox.information(self, '信息', 'socket正在查找主机名称')
+        elif self.tcpClient.state() == QAbstractSocket.ConnectedState:
+            QMessageBox.information(self, '信息', '连接已建立')
+        elif self.tcpClient.state() == QAbstractSocket.BoundState:
+            QMessageBox.information(self, '信息', 'socket绑定到一个地址和端口')
+        elif self.tcpClient.state() == QAbstractSocket.ClosingState:
+            QMessageBox.information(self, '信息', 'socket即将关闭')
+        elif self.tcpClient.state() == QAbstractSocket.ConnectedState:
+            QMessageBox.information(self, '信息', '仅限内部使用')
+
     @pyqtSlot()
     def processTcpClientDatagrams(self):
         data = self.tcpClient.readLine()
+        data = data.data()
         print(data)
         self.tcpClientRecvDataReady.emit(data)
 
@@ -64,14 +82,13 @@ class TcpClient(QWidget):
         self.tcpClient.write(QByteArray(a2b_hex(frame)))
 
     @pyqtSlot()
-    def sendRequest(self):
-        # QMessageBox.information(self, '信息', '已连接到TCP Server')
-        print('connect')
+    def hasConnected(self):
+        QMessageBox.information(self, '信息', '已连接到TCP Server')
         pass
 
     @pyqtSlot()
-    def serverHasStopped(self):
-        print('disconnect')
+    def hasClosed(self):
+        QMessageBox.information(self, '信息', '已关闭到TCP Server的连接')
         self.tcpClient.close()
 
 if __name__ == "__main__":

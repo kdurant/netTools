@@ -43,9 +43,6 @@ class TcpServer(QWidget):
     def signalSlot(self):
         self.linkRbtn.clicked.connect(self.ctrlTcpStatus)
         self.tcpServer.newConnection.connect(self.addConnection)
-        # self.tcpServer.readyRead.connect(self.processTcpClientDatagrams)
-        # self.tcpServer.disconnected.connect(self.removeConnection)
-        # self.tcpServer.error.connect(self.socketError)
         pass
 
     @pyqtSlot()
@@ -63,15 +60,15 @@ class TcpServer(QWidget):
             self.clientConnection.nextBlockSize = 0
 
             self.clientConnection.readyRead.connect(self.processTcpClientDatagrams)
-            # self.clientConnection.disconnected.connect(self.removeConnection)
-            # self.clientConnection.error.connect(self.socketError)
+            self.clientConnection.disconnected.connect(self.removeConnection)
+            self.clientConnection.error.connect(self.socketError)
 
         except Exception as ex:
             QMessageBox.information(None, "Network Error", ex.message)
 
     @pyqtSlot()
     def sendTcpServerFrame(self, frame):
-        self.tcpClient.write(QByteArray(a2b_hex(frame)))
+        self.clientConnection.write(QByteArray(a2b_hex(frame)))
 
     @pyqtSlot()
     def processTcpClientDatagrams(self):
@@ -83,8 +80,16 @@ class TcpServer(QWidget):
         print(data)
         self.tcpClientRecvDataReady.emit(data)
 
+        self.sendTcpServerFrame('123456')
+
     def newConnect(self):
         print('new connect')
+
+    def removeConnection(self):
+        pass
+
+    def socketError(self):
+        pass
 
 
 if __name__ == "__main__":
