@@ -60,7 +60,7 @@ class TcpClient(QWidget):
         self.tcpClientRecvDataReady.emit(data)
 
     @pyqtSlot()
-    def sendTcpFrame(self, frame):
+    def sendTcpClientFrame(self, frame):
         self.tcpClient.write(QByteArray(a2b_hex(frame)))
 
     @pyqtSlot()

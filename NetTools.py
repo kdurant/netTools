@@ -53,7 +53,7 @@ class NetTools(QMainWindow):
 
     def sendData(self):
         # self.udpModule.sendUdpFrame('1234', 'utf8')
-        self.tcpClientModule.sendTcpFrame('12345678123456781234567812345678')
+        self.tcpClientModule.sendTcpClientFrame('12345678123456781234567812345678')
 
 if __name__ == "__main__":
     import sys
