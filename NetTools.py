@@ -17,12 +17,16 @@ class NetTools(QMainWindow):
         self.timer.start(1000)
         self.timer.timeout.connect(self.queryStatus)
 
+
     def initUI(self):
 
         self.udpModule = UdpWidget()
-        self.tcpClientModule =TcpClient()
+        self.tcpClientModule = TcpClient()
         self.tcpServerModule = TcpServer()
 
+        self.udpModule.recvDataReady[bytes, str, int].connect(self.showUdpData)
+        self.tcpClientModule.recvDataReady[bytes].connect(self.showData)
+        self.tcpServerModule.recvDataReady[bytes].connect(self.showData)
         test = self.testUI()
 
         toolbox = QToolBox()
@@ -45,10 +49,14 @@ class NetTools(QMainWindow):
 
     def testUI(self):
 
+        self.sendText = QTextEdit()
+        self.recvText = QTextEdit()
         self.btn = QPushButton('send')
         self.btn.clicked.connect(self.sendData)
         vbox = QVBoxLayout()
+        vbox.addWidget(self.recvText)
         vbox.addWidget(self.btn)
+        vbox.addWidget(self.sendText)
 
         frame = QFrame()
         frame.setLayout(vbox)
@@ -56,11 +64,23 @@ class NetTools(QMainWindow):
         return frame
 
     def sendData(self):
-        # self.udpModule.sendUdpFrame('1234', 'utf8')
-        self.tcpClientModule.sendTcpClientFrame('12345678123456781234567812345678')
+        data = self.recvText.toPlainText()
+        self.udpModule.sendUdpFrame(data, 'utf8')
+        # self.tcpClientModule.sendTcpClientFrame(self.recvText.toPlainText())
+
+    def showData(self, frame):
+        data = frame.decode(encoding='utf-8')
+        self.sendText.append(data)
+        pass
+
+    def showUdpData(self, frame, host, port):
+        data = frame.decode(encoding='utf-8')
+        self.sendText.append(data)
+        pass
 
     def queryStatus(self):
-        print(self.tcpClientModule.currentStatus())
+        # print(self.tcpClientModule.currentStatus())
+        pass
 
 if __name__ == "__main__":
     import sys

@@ -6,7 +6,7 @@ from PyQt5.QtNetwork import QTcpServer, QAbstractSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
 
 class TcpServer(QWidget):
-    tcpClientRecvDataReady = pyqtSignal(bytes)
+    recvDataReady = pyqtSignal(bytes)
     def __init__(self):
         super(TcpServer, self).__init__()
         self.tcpServer = QTcpServer()
@@ -94,9 +94,7 @@ class TcpServer(QWidget):
         print(data)
         data = data.data()
         print(data)
-        self.tcpClientRecvDataReady.emit(data)
-
-        self.sendTcpServerFrame('123456')
+        self.recvDataReady.emit(data)
 
     def newConnect(self):
         print('new connect')
