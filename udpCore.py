@@ -40,9 +40,7 @@ class UdpCore(QWidget):
         self.targetIP.setToolTip('发送数据时，本机需要匹配其他设备IP地址和端口号')
         self.targetPort = QLineEdit('4444')
 
-        self.bindLabel = QLabel()
-        self.bindLabel.setPixmap(QPixmap('images/inactive.svg').scaled(QSize(24, 24)))
-        self.bindBtn = QPushButton('已经断开')
+        self.bindRbtn = QRadioButton()
         #
         # label = QLabel()
         # label.setPixmap(QPixmap('images/debug.svg').scaled(QSize(150, 150)))
@@ -55,8 +53,7 @@ class UdpCore(QWidget):
 
         hbox = QHBoxLayout()
         hbox.addStretch(1)
-        hbox.addWidget(self.bindBtn)
-        hbox.addWidget(self.bindLabel)
+        hbox.addWidget(self.bindRbtn)
         hbox.addStretch(1)
 
         mainLayout = QVBoxLayout()
@@ -67,7 +64,7 @@ class UdpCore(QWidget):
         return groupBox
 
     def signalSlot(self):
-        self.bindBtn.clicked.connect(self.udpLinkStatus)
+        self.bindRbtn.clicked.connect(self.udpLinkStatus)
 
     def udpConfig(self):
         status = self.udpSocket.bind(int(self.masterPort.text()))
@@ -104,17 +101,13 @@ class UdpCore(QWidget):
 
     @pyqtSlot()
     def udpLinkStatus(self):
-        if self.bindBtn.text() == '已经断开':
-            self.bindBtn.setText('已经连接')
-            self.bindLabel.setPixmap(QPixmap('images/active.svg').scaled(QSize(24, 24)))
+        if self.bindRbtn.isChecked():
             status = self.udpSocket.bind(int(self.masterPort.text()))
             if status:
                 self.udpSocket.readyRead.connect(self.processUDPDatagrams)
             else:
                 QMessageBox.warning(self, "警告", 'UDP端口被占用')
         else:
-            self.bindBtn.setText('已经断开')
-            self.bindLabel.setPixmap(QPixmap('images/inactive.svg').scaled(QSize(24, 24)))
             self.udpSocket.disconnectFromHost()
 
     def currentStatus(self):
