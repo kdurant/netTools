@@ -79,7 +79,7 @@ class NetTools(QMainWindow):
         pass
 
     def queryStatus(self):
-        # print(self.tcpClientModule.currentStatus())
+        print(self.udpModule.currentStatus())
         pass
 
 if __name__ == "__main__":

@@ -41,9 +41,6 @@ class UdpCore(QWidget):
         self.targetPort = QLineEdit('4444')
 
         self.bindRbtn = QRadioButton()
-        #
-        # label = QLabel()
-        # label.setPixmap(QPixmap('images/debug.svg').scaled(QSize(150, 150)))
 
         form = QFormLayout()
         form.addRow('本机IP地址：', self.masterIP)
@@ -84,12 +81,13 @@ class UdpCore(QWidget):
         else:
             data = a2b_hex(frame)
 
-        if boardCast:
-            self.udpSocket.writeDatagram(QByteArray(data), QHostAddress.Broadcast,
-                                     int(self.targetPort.text()))
-        else:
-            self.udpSocket.writeDatagram(QByteArray(data), QHostAddress(self.targetIP.text()),
+        if self.udpSocket.state() == QAbstractSocket.BoundState:
+            if boardCast:
+                self.udpSocket.writeDatagram(QByteArray(data), QHostAddress.Broadcast,
                                          int(self.targetPort.text()))
+            else:
+                self.udpSocket.writeDatagram(QByteArray(data), QHostAddress(self.targetIP.text()),
+                                             int(self.targetPort.text()))
 
     @pyqtSlot()
     def processUDPDatagrams(self):
