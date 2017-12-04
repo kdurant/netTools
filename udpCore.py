@@ -6,13 +6,13 @@ from PyQt5.QtNetwork import QUdpSocket, QAbstractSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
 
 
-class UdpWidget(QWidget):
+class UdpCore(QWidget):
     '''
     UDP作为Server，只需要绑定本机IP地址和端口号，Client发送数据时，指定正确的地址和端口号即可
     '''
     recvDataReady = pyqtSignal(bytes, str, int)
     def __init__(self):
-        super(UdpWidget, self).__init__()
+        super(UdpCore, self).__init__()
         self.initUI()
 
         '''
@@ -140,6 +140,6 @@ class UdpWidget(QWidget):
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
-    ui = UdpWidget()
+    ui = UdpCore()
     ui.show()
     sys.exit(app.exec_())

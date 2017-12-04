@@ -7,7 +7,7 @@ from binascii import a2b_hex, b2a_hex
 
 from tcpClient import *
 from tcpServer import *
-from udpWidget import *
+from udpCore import *
 
 class NetTools(QMainWindow):
     def __init__(self):
@@ -20,7 +20,7 @@ class NetTools(QMainWindow):
 
     def initUI(self):
 
-        self.udpModule = UdpWidget()
+        self.udpModule = UdpCore()
         self.tcpClientModule = TcpClient()
         self.tcpServerModule = TcpServer()
 
