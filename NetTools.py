@@ -65,7 +65,7 @@ class NetTools(QMainWindow):
 
     def sendData(self):
         data = self.recvText.toPlainText()
-        self.udpModule.sendUdpFrame(data, 'utf8')
+        self.udpModule.sendFrame(data, 'utf8')
         # self.tcpClientModule.sendTcpClientFrame(self.recvText.toPlainText())
 
     def showData(self, frame):

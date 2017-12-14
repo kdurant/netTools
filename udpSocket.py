@@ -4,6 +4,36 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtNetwork import QUdpSocket, QAbstractSocket, QHostAddress
 from binascii import a2b_hex, b2a_hex
+import socket
+from threading import Thread
+
+class Socket(QObject):
+    recvDataReady = pyqtSignal(bytes, str, int)
+    def __init__(self):
+        super(Socket, self).__init__()
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.runFlag = False
+
+    def config(self, addr, port, buf_size):
+
+        # self.socket.bind(('127.0.0.1', 6666))
+        self.socket.bind((addr, port))
+        self.buf_size = buf_size
+
+    def start(self):
+        self.runFlag = True
+
+    def stop(self):
+        self.runFlag = False
+
+    def close(self):
+        self.socket.close()
+
+    def receive(self):
+        while self.runFlag:
+            data, address = self.udpServerSocket.recvfrom(self.buf_size)
+            self.recvDataReady.emit(data, address[0], address[1])
+
 
 
 class UdpCore(QWidget):
@@ -14,11 +44,7 @@ class UdpCore(QWidget):
     def __init__(self):
         super(UdpCore, self).__init__()
         self.initUI()
-
-        '''
-        disconnectFromHost, close, abort好像都可以中断udp bind状态
-        '''
-        self.udpSocket = QUdpSocket(self)
+        self.udpSocket = Socket()
         self.signalSlot()
 
     def initUI(self):
@@ -63,13 +89,10 @@ class UdpCore(QWidget):
 
     def signalSlot(self):
         self.bindRbtn.clicked.connect(self.udpLinkStatus)
+        self.udpSocket.recvDataReady[bytes, str, int].connect(self.processUDPDatagrams)
 
-    def udpConfig(self):
-        status = self.udpSocket.bind(int(self.masterPort.text()))
-        if status:
-            self.udpSocket.readyRead.connect(self.processUDPDatagrams)
-        else:
-            QMessageBox.warning(self, "警告", 'UDP端口被占用')
+    # def udpConfig(self):
+    #     self.udpSocket.config(self.masterIP.text(), int(self.masterPort.text()), 2048)
 
     @pyqtSlot(str)
     def sendFrame(self, frame, dataMode='hex', boardCast=False):
@@ -82,54 +105,24 @@ class UdpCore(QWidget):
         else:
             data = a2b_hex(frame)
 
-        if self.udpSocket.state() == QAbstractSocket.BoundState:
-            if boardCast:
-                self.udpSocket.writeDatagram(QByteArray(data), QHostAddress.Broadcast,
-                                         int(self.targetPort.text()))
-            else:
-                self.udpSocket.writeDatagram(QByteArray(data), QHostAddress(self.targetIP.text()),
-                                             int(self.targetPort.text()))
 
     @pyqtSlot()
-    def processUDPDatagrams(self):
-        while self.udpSocket.hasPendingDatagrams():
-            # datagram, host, port = self.udpSocket.readDatagram(self.udpSocket.pendingDatagramSize())
-            datagram, host, port = self.udpSocket.readDatagram(65535*4)
-            if datagram:
-                # print(datagram)
-                self.recvDataReady.emit(datagram, host.toString(), port)
+    def processUDPDatagrams(self, data, addr, port):
+        print(data)
 
     @pyqtSlot()
     def udpLinkStatus(self):
         if self.bindRbtn.isChecked():
-            status = self.udpSocket.bind(int(self.masterPort.text()))
-            if status:
-                self.udpSocket.readyRead.connect(self.processUDPDatagrams)
-            else:
+            try:
+                self.udpSocket.config(self.masterIP.text(), int(self.masterPort.text()), 2048)
+            except OSError:
                 QMessageBox.warning(self, "警告", 'UDP端口被占用')
-                self.bindRbtn.setChecked(False)
         else:
-            self.udpSocket.disconnectFromHost()
+            self.udpSocket.close()
+        pass
 
     def currentStatus(self):
-        '''
-        udp只有BoundState和UnconnectedState
-        :return:
-        '''
-        if self.udpSocket.state() == QAbstractSocket.UnconnectedState:
-            return 'socket没有连接'
-        elif self.udpSocket.state() == QAbstractSocket.HostLookupState:
-            return 'socket正在查找主机名称'
-        elif self.udpSocket.state() == QAbstractSocket.ConnectingState:
-            return 'socket正在查找主机名称'
-        elif self.udpSocket.state() == QAbstractSocket.ConnectedState:
-            return '连接已建立'
-        elif self.udpSocket.state() == QAbstractSocket.BoundState:
-            return 'socket绑定到一个地址和端口'
-        elif self.udpSocket.state() == QAbstractSocket.ClosingState:
-            return 'socket即将关闭'
-        elif self.udpSocket.state() == QAbstractSocket.ConnectedState:
-            return '仅限内部使用'
+        pass
 
 if __name__ == "__main__":
     import sys
