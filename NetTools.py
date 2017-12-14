@@ -69,17 +69,20 @@ class NetTools(QMainWindow):
         # self.tcpClientModule.sendTcpClientFrame(self.recvText.toPlainText())
 
     def showData(self, frame):
-        data = frame.decode(encoding='utf-8')
-        self.sendText.append(data)
+        # print(data)
+        # self.sendText.append(data)
         pass
 
     def showUdpData(self, frame, host, port):
-        data = frame.decode(encoding='utf-8')
+        data = b2a_hex(frame)
+        # print(data)
+        data = data.decode(encoding='utf-8')
+        print(data)
         self.sendText.append(data)
         pass
 
     def queryStatus(self):
-        print(self.udpModule.currentStatus())
+        # print(self.udpModule.currentStatus())
         pass
 
 if __name__ == "__main__":

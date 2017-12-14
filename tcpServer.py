@@ -91,9 +91,9 @@ class TcpServer(QWidget):
         socket = self.sender()
         data = socket.readAll()
         # data = socket.readLine()
-        print(data)
+        # print(data)
         data = data.data()
-        print(data)
+        # print(data)
         self.recvDataReady.emit(data)
 
     def newConnect(self):
